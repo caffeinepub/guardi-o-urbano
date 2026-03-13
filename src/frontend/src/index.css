@@ -1,0 +1,97 @@
+@import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,400;12..96,600;12..96,700;12..96,800&family=Figtree:wght@300;400;500;600;700&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0 0;
+    --foreground: 97 0.01 260;
+    --card: 15 0.02 240;
+    --card-foreground: 97 0.01 260;
+    --popover: 15 0.02 240;
+    --popover-foreground: 97 0.01 260;
+    --primary: 55 0.22 25;
+    --primary-foreground: 100 0 0;
+    --secondary: 18 0.03 240;
+    --secondary-foreground: 85 0.04 260;
+    --muted: 18 0.03 240;
+    --muted-foreground: 65 0.06 250;
+    --accent: 20 0.04 240;
+    --accent-foreground: 90 0.02 260;
+    --destructive: 55 0.22 25;
+    --destructive-foreground: 100 0 0;
+    --border: 20 0.04 240;
+    --input: 20 0.04 240;
+    --ring: 55 0.22 25;
+    --radius: 0.75rem;
+    --chart-1: 55 0.22 25;
+    --chart-2: 65 0.15 160;
+    --chart-3: 70 0.15 220;
+    --chart-4: 75 0.18 90;
+    --chart-5: 60 0.2 60;
+    --sidebar: 15 0.02 240;
+    --sidebar-foreground: 97 0.01 260;
+    --sidebar-primary: 55 0.22 25;
+    --sidebar-primary-foreground: 100 0 0;
+    --sidebar-accent: 20 0.04 240;
+    --sidebar-accent-foreground: 85 0.04 260;
+    --sidebar-border: 20 0.04 240;
+    --sidebar-ring: 55 0.22 25;
+    /* Custom app colors */
+    --sos-red: 50 0.23 27;
+    --sos-red-light: 60 0.2 27;
+    --navy-deep: 10 0.03 250;
+    --navy-mid: 18 0.04 245;
+    --safe-green: 65 0.18 145;
+    --warning-amber: 72 0.2 65;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground font-body;
+    -webkit-font-smoothing: antialiased;
+  }
+}
+
+/* SOS Pulse Animation */
+@keyframes sos-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 oklch(50% 0.23 27 / 0.7);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 0 24px oklch(50% 0.23 27 / 0);
+    transform: scale(1.04);
+  }
+}
+
+.sos-pulse {
+  animation: sos-pulse 2s ease-in-out infinite;
+}
+
+@keyframes emergency-glow {
+  0%,
+  100% {
+    background-color: oklch(10% 0.03 250);
+  }
+  50% {
+    background-color: oklch(15% 0.06 27);
+  }
+}
+
+.emergency-bg {
+  animation: emergency-glow 2s ease-in-out infinite;
+}
+
+/* Leaflet override */
+.leaflet-container {
+  background: oklch(5% 0 0);
+  font-family: inherit;
+}
