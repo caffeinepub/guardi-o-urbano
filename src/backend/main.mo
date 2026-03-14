@@ -10,9 +10,9 @@ import Runtime "mo:core/Runtime";
 import Principal "mo:core/Principal";
 import MixinAuthorization "authorization/MixinAuthorization";
 import AccessControl "authorization/access-control";
-import Migration "migration";
 
-(with migration = Migration.run)
+
+
 actor {
   let accessControlState = AccessControl.initState();
   include MixinAuthorization(accessControlState);
@@ -172,7 +172,7 @@ actor {
     };
 
     users.add(caller, userProfile);
-    AccessControl.assignRole(accessControlState, caller, caller, #user);
+    accessControlState.userRoles.add(caller, #user);
   };
 
   public query ({ caller }) func getCallerUserProfile() : async ?UserProfile {
@@ -731,7 +731,7 @@ actor {
       case (?user) {
         let updated = { user with isAdmin = true };
         users.add(caller, updated);
-        AccessControl.assignRole(accessControlState, caller, caller, #admin);
+        accessControlState.userRoles.add(caller, #admin);
       };
     };
   };

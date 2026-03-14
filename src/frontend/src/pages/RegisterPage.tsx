@@ -74,7 +74,7 @@ export function RegisterPage() {
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="João Silva"
-              className="h-12 bg-card"
+              className="h-12 bg-black text-white border-zinc-700 placeholder:text-zinc-500"
             />
           </div>
           <div className="space-y-2">
@@ -86,7 +86,7 @@ export function RegisterPage() {
               onChange={(e) => setPhone(e.target.value)}
               placeholder="+258 84 000 0000"
               type="tel"
-              className="h-12 bg-card"
+              className="h-12 bg-black text-white border-zinc-700 placeholder:text-zinc-500"
             />
           </div>
           <div className="space-y-2">
@@ -97,7 +97,7 @@ export function RegisterPage() {
               value={neighborhood}
               onChange={(e) => setNeighborhood(e.target.value)}
               placeholder="Bairro Central"
-              className="h-12 bg-card"
+              className="h-12 bg-black text-white border-zinc-700 placeholder:text-zinc-500"
             />
           </div>
           <div className="space-y-2">
@@ -108,7 +108,7 @@ export function RegisterPage() {
               value={licenseCode}
               onChange={(e) => setLicenseCode(e.target.value.toUpperCase())}
               placeholder="GU-XXXX-XXXX"
-              className="h-12 bg-card font-mono tracking-widest"
+              className="h-12 bg-black text-white border-zinc-700 placeholder:text-zinc-500 font-mono tracking-widest"
             />
           </div>
 

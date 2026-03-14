@@ -12,6 +12,7 @@ import { useEffect } from "react";
 import { AdminPage } from "./pages/AdminPage";
 import { CommunityPage } from "./pages/CommunityPage";
 import { DashboardPage } from "./pages/DashboardPage";
+import { EmergencyContactsPage } from "./pages/EmergencyContactsPage";
 import { ExpiredPage } from "./pages/ExpiredPage";
 import { LocationPage } from "./pages/LocationPage";
 import { LoginPage } from "./pages/LoginPage";
@@ -20,6 +21,7 @@ import { ProfilePage } from "./pages/ProfilePage";
 import { RegisterPage } from "./pages/RegisterPage";
 import { RemoteAdminPage } from "./pages/RemoteAdminPage";
 import { SOSActivePage } from "./pages/SOSActivePage";
+import { SOSTabPage } from "./pages/SOSTabPage";
 import { ShareViewPage } from "./pages/ShareViewPage";
 
 const rootRoute = createRootRoute({
@@ -62,6 +64,18 @@ const dashboardRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/dashboard",
   component: DashboardPage,
+});
+
+const sosTabRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/sos",
+  component: SOSTabPage,
+});
+
+const contactsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/contacts",
+  component: EmergencyContactsPage,
 });
 
 const mapRoute = createRoute({
@@ -118,6 +132,8 @@ const routeTree = rootRoute.addChildren([
   registerRoute,
   expiredRoute,
   dashboardRoute,
+  sosTabRoute,
+  contactsRoute,
   mapRoute,
   communityRoute,
   locationRoute,

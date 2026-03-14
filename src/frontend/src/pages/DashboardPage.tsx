@@ -7,63 +7,54 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import {
   AlertTriangle,
   CheckCircle,
   HelpCircle,
-  Loader2,
   MapPin,
+  RefreshCcw,
   Shield,
 } from "lucide-react";
 import { motion } from "motion/react";
 import { useEffect, useState } from "react";
-import { toast } from "sonner";
 import { BottomNav } from "../components/BottomNav";
-import {
-  formatDate,
-  useCreateSOS,
-  useIncidents,
-  useProfile,
-} from "../hooks/useBackend";
+import { formatDate, useIncidents, useProfile } from "../hooks/useBackend";
 
 const helpSections = [
   {
     emoji: "🚨",
     title: "Alerta SOS",
-    desc: "Prima o botão vermelho SOS em caso de emergência. O alerta será enviado com a sua localização GPS para toda a comunidade. Prima novamente para ver o estado do alerta.",
+    desc: "Prima o botão SOS na aba SOS em caso de emergência. O alerta será enviado com a sua localização GPS para os seus contactos de emergência.",
+  },
+  {
+    emoji: "👥",
+    title: "Contactos de Emergência",
+    desc: "Na aba Contactos, adiciona as pessoas que receberão alertas SMS ou chamadas quando ativar o SOS.",
   },
   {
     emoji: "🗺️",
     title: "Mapa de Ocorrências",
-    desc: "Aceda ao separador 'Mapa' para ver ocorrências reportadas em tempo real. Pode adicionar novas ocorrências tocando no botão '+' no mapa.",
-  },
-  {
-    emoji: "👥",
-    title: "Comunidade",
-    desc: "No separador 'Comunidade' veja e comente as últimas ocorrências reportadas pelos outros membros.",
+    desc: "Acede ao Mapa pelo atalho rápido para ver ocorrências reportadas em tempo real na tua zona.",
   },
   {
     emoji: "📍",
     title: "Partilha de Localização",
-    desc: "Em 'Localização', active a partilha de localização em tempo real para que a sua família ou equipa saiba onde está. Pode também gerar um link para partilhar.",
+    desc: "Em 'Localização', ativa a partilha em tempo real para que família ou equipa saiba onde estás.",
   },
   {
     emoji: "👤",
-    title: "Perfil e Licença",
-    desc: "No separador 'Perfil' veja o estado da sua licença, data de expiração e código de ativação. A licença é gerida pelo administrador.",
-  },
-  {
-    emoji: "🔐",
-    title: "Acesso Admin",
-    desc: "Se for o administrador, no perfil encontrará o botão para aceder ao painel de gestão de licenças e utilizadores.",
+    title: "Conta & Licença",
+    desc: "Na aba Conta vê o estado da tua licença, data de expiração e código de ativação.",
   },
 ];
 
 export function DashboardPage() {
-  const { data: profile } = useProfile();
+  const qc = useQueryClient();
+  const { data: profile, isLoading: profileLoading, isError } = useProfile();
   const { data: incidents } = useIncidents();
-  const { mutate: createSOS, isPending: sosLoading } = useCreateSOS();
   const navigate = useNavigate();
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(
     null,
@@ -80,41 +71,12 @@ export function DashboardPage() {
 
   const activeIncidents =
     incidents?.filter((i) => i.status !== "removed").length ?? 0;
-  const hasActiveSOS = !!localStorage.getItem("guardiao_sos_id");
-
-  const handleSOS = () => {
-    if (!profile) return;
-    if (hasActiveSOS) {
-      navigate({ to: "/sos-active" });
-      return;
-    }
-    if (!location) {
-      toast.error("Aguardando localização GPS...");
-      return;
-    }
-    createSOS(
-      {
-        userName: profile.name,
-        lat: location.lat,
-        lng: location.lng,
-        neighborhood: profile.licenseCode,
-      },
-      {
-        onSuccess: (id) => {
-          localStorage.setItem("guardiao_sos_id", id as string);
-          toast.success("Alerta SOS enviado!");
-          navigate({ to: "/sos-active" });
-        },
-        onError: () => toast.error("Erro ao enviar SOS"),
-      },
-    );
-  };
 
   const licenseColor =
     profile?.licenseStatus === "active"
       ? "text-green-400"
       : profile?.licenseStatus === "expired"
-        ? "text-destructive"
+        ? "text-red-400"
         : "text-yellow-400";
 
   return (
@@ -132,101 +94,100 @@ export function DashboardPage() {
             "radial-gradient(circle at 30% 40%, oklch(45% 0.22 25 / 0.35) 0%, transparent 55%), radial-gradient(circle at 75% 70%, oklch(35% 0.18 20 / 0.25) 0%, transparent 45%)",
         }}
       />
-      <header className="relative z-10 flex items-center justify-between border-b border-border/50 bg-card/80 px-4 py-3 backdrop-blur-sm">
+
+      <header className="relative z-10 flex items-center justify-between border-b border-white/10 bg-black/30 px-4 py-3 backdrop-blur-sm">
         <div className="flex items-center gap-2">
-          <Shield className="h-5 w-5 text-primary" />
-          <span className="font-display text-sm font-bold text-foreground">
-            Guardião Urbano
-          </span>
+          <Shield className="h-5 w-5 text-orange-400" />
+          <span className="font-bold text-white">Guardião Urbano</span>
         </div>
-        <Badge
-          variant={
-            profile?.licenseStatus === "active" ? "default" : "destructive"
-          }
-          className="text-xs"
-        >
-          {profile?.licenseStatus === "active"
-            ? "Licença Ativa"
-            : "Licença Inativa"}
-        </Badge>
+        {profileLoading ? (
+          <Skeleton className="h-5 w-20 bg-white/10" />
+        ) : (
+          <Badge
+            variant={
+              profile?.licenseStatus === "active" ? "default" : "destructive"
+            }
+            className={
+              profile?.licenseStatus === "active"
+                ? "bg-green-700 text-white"
+                : ""
+            }
+          >
+            {profile?.licenseStatus === "active" ? "Ativa" : "Inativa"}
+          </Badge>
+        )}
       </header>
 
-      <main className="relative z-10 flex flex-1 flex-col gap-6 px-4 pt-6">
+      <main className="relative z-10 flex flex-1 flex-col gap-5 px-4 pt-5">
+        {/* Welcome */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
         >
-          <p className="text-muted-foreground">Bem-vindo,</p>
-          <h2 className="font-display text-2xl font-bold text-foreground">
-            {profile?.name ?? "Utilizador"}
-          </h2>
+          <p className="text-sm text-white/50">Bem-vindo,</p>
+          {profileLoading ? (
+            <Skeleton className="mt-1 h-7 w-40 bg-white/10" />
+          ) : isError || (!profileLoading && !profile) ? (
+            <div
+              data-ocid="dashboard.error_state"
+              className="mt-2 rounded-xl border border-red-500/30 bg-red-500/10 p-3"
+            >
+              <p className="text-sm text-red-300">
+                Erro ao carregar dados. Tenta de novo.
+              </p>
+              <Button
+                data-ocid="dashboard.secondary_button"
+                size="sm"
+                variant="ghost"
+                className="mt-2 text-orange-400"
+                onClick={() => qc.invalidateQueries({ queryKey: ["profile"] })}
+              >
+                <RefreshCcw className="mr-1.5 h-3.5 w-3.5" /> Tentar de novo
+              </Button>
+            </div>
+          ) : (
+            <h2 className="text-2xl font-bold text-white">
+              {profile?.name ?? "Utilizador"}
+            </h2>
+          )}
         </motion.div>
 
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.1 }}
-          className="flex flex-col items-center gap-3 py-4"
-        >
-          <button
-            type="button"
-            data-ocid="dashboard.primary_button"
-            onClick={handleSOS}
-            disabled={sosLoading}
-            className={`relative flex h-36 w-36 items-center justify-center rounded-full font-display text-2xl font-black tracking-wider text-white shadow-glow transition-all active:scale-95 ${
-              hasActiveSOS
-                ? "bg-orange-600 sos-pulse"
-                : "bg-destructive sos-pulse hover:bg-destructive/90"
-            }`}
-          >
-            {sosLoading ? (
-              <Loader2 className="h-10 w-10 animate-spin" />
-            ) : (
-              <span className="select-none">SOS</span>
-            )}
-          </button>
-          <p className="text-sm text-muted-foreground">
-            {hasActiveSOS
-              ? "⚠️ Alerta ativo — toque para ver"
-              : "Toque em caso de emergência"}
-          </p>
-        </motion.div>
-
+        {/* Status cards */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
+          transition={{ delay: 0.1 }}
           className="grid grid-cols-2 gap-3"
         >
-          {/* License card with primary left accent */}
-          <div className="rounded-2xl border border-border/50 border-l-2 border-l-primary bg-gradient-to-br from-card to-card/60 p-4">
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
             <div className="flex items-center gap-2">
               <CheckCircle className={`h-4 w-4 ${licenseColor}`} />
-              <span className="text-xs text-muted-foreground">Licença</span>
+              <span className="text-xs text-white/50">Licença</span>
             </div>
-            <p className={`mt-1 text-sm font-semibold ${licenseColor}`}>
-              {profile?.licenseStatus === "active"
-                ? "Ativa"
-                : (profile?.licenseStatus ?? "—")}
-            </p>
-            {profile && (
-              <p className="mt-0.5 text-xs text-muted-foreground">
-                Expira: {formatDate(profile.licenseExpiry)}
-              </p>
+            {profileLoading ? (
+              <Skeleton className="mt-2 h-4 w-16 bg-white/10" />
+            ) : (
+              <>
+                <p className={`mt-1 text-sm font-semibold ${licenseColor}`}>
+                  {profile?.licenseStatus === "active"
+                    ? "Ativa"
+                    : (profile?.licenseStatus ?? "—")}
+                </p>
+                {profile && (
+                  <p className="mt-0.5 text-xs text-white/40">
+                    Expira: {formatDate(profile.licenseExpiry)}
+                  </p>
+                )}
+              </>
             )}
           </div>
 
-          {/* Location card with green/yellow left accent */}
-          <div
-            className={`rounded-2xl border border-border/50 border-l-2 bg-gradient-to-br from-card to-card/60 p-4 ${
-              location ? "border-l-green-400" : "border-l-yellow-400"
-            }`}
-          >
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
             <div className="flex items-center gap-2">
               <MapPin
                 className={`h-4 w-4 ${location ? "text-green-400" : "text-yellow-400"}`}
               />
-              <span className="text-xs text-muted-foreground">Localização</span>
+              <span className="text-xs text-white/50">GPS</span>
             </div>
             <p
               className={`mt-1 text-sm font-semibold ${location ? "text-green-400" : "text-yellow-400"}`}
@@ -234,29 +195,64 @@ export function DashboardPage() {
               {location ? "Disponível" : "A obter..."}
             </p>
             {location && (
-              <p className="mt-0.5 text-xs text-muted-foreground">
-                {location.lat.toFixed(4)}, {location.lng.toFixed(4)}
+              <p className="mt-0.5 text-xs text-white/40">
+                {location.lat.toFixed(3)}, {location.lng.toFixed(3)}
               </p>
             )}
           </div>
         </motion.div>
 
+        {/* Quick actions */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="grid grid-cols-2 gap-3"
+        >
+          {[
+            {
+              label: "Mapa",
+              emoji: "🗺️",
+              to: "/map",
+              ocid: "dashboard.primary_button",
+            },
+            {
+              label: "Comunidade",
+              emoji: "👥",
+              to: "/community",
+              ocid: "dashboard.secondary_button",
+            },
+          ].map(({ label, emoji, to, ocid }) => (
+            <button
+              key={to}
+              type="button"
+              data-ocid={ocid}
+              onClick={() => navigate({ to })}
+              className="flex flex-col items-center gap-2 rounded-2xl border border-white/10 bg-white/5 p-5 text-sm font-medium text-white/70 transition-all hover:border-orange-500/30 hover:bg-orange-500/10 hover:text-white active:scale-95"
+            >
+              <span className="text-3xl">{emoji}</span>
+              <span>{label}</span>
+            </button>
+          ))}
+        </motion.div>
+
+        {/* Alerts */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="rounded-2xl border border-border/50 bg-card p-4"
+          className="rounded-2xl border border-white/10 bg-white/5 p-4"
         >
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <AlertTriangle className="h-4 w-4 text-yellow-400" />
-              <span className="font-medium text-foreground">
-                Alertas Recentes
-              </span>
+              <span className="font-medium text-white">Alertas Recentes</span>
             </div>
-            <Badge variant="secondary">{activeIncidents}</Badge>
+            <Badge variant="secondary" className="bg-white/10 text-white">
+              {activeIncidents}
+            </Badge>
           </div>
-          <p className="mt-2 text-sm text-muted-foreground">
+          <p className="mt-2 text-sm text-white/50">
             {activeIncidents > 0
               ? `${activeIncidents} ocorrência${activeIncidents !== 1 ? "s" : ""} registada${activeIncidents !== 1 ? "s" : ""} na comunidade.`
               : "Sem ocorrências recentes na sua zona."}
@@ -264,58 +260,32 @@ export function DashboardPage() {
           <Button
             data-ocid="dashboard.secondary_button"
             variant="ghost"
-            className="mt-2 h-8 px-2 text-xs text-primary"
+            className="mt-1 h-8 px-0 text-xs text-orange-400 hover:text-orange-300"
             onClick={() => navigate({ to: "/map" })}
           >
             Ver no mapa →
           </Button>
         </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-          className="grid grid-cols-3 gap-2"
-        >
-          {[
-            { label: "Mapa", emoji: "🗺️", to: "/map" },
-            { label: "Comunidade", emoji: "👥", to: "/community" },
-            { label: "Localização", emoji: "📍", to: "/location" },
-          ].map(({ label, emoji, to }) => (
-            <button
-              key={to}
-              type="button"
-              data-ocid="dashboard.secondary_button"
-              onClick={() => navigate({ to })}
-              className="flex flex-col items-center gap-1 rounded-2xl border border-border/50 bg-card p-3 text-xs text-muted-foreground transition-all hover:border-primary/40 hover:bg-primary/10 hover:text-foreground active:scale-95"
-            >
-              <span className="text-3xl">{emoji}</span>
-              <span>{label}</span>
-            </button>
-          ))}
-        </motion.div>
       </main>
 
-      {/* Floating Help Button */}
+      {/* Help */}
       <button
         type="button"
-        data-ocid="dashboard.help_button"
+        data-ocid="dashboard.button"
         onClick={() => setHelpOpen(true)}
-        className="fixed bottom-24 right-4 z-40 flex h-12 w-12 items-center justify-center rounded-full border border-border/60 bg-card text-muted-foreground shadow-lg transition-all hover:bg-accent hover:text-foreground active:scale-95"
-        aria-label="Como usar"
+        className="fixed bottom-24 right-4 z-40 flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-black/40 text-white/50 shadow-lg backdrop-blur transition-all hover:text-white active:scale-90"
       >
         <HelpCircle className="h-5 w-5" />
       </button>
 
-      {/* How to Use Sheet */}
       <Sheet open={helpOpen} onOpenChange={setHelpOpen}>
         <SheetContent
           side="bottom"
           data-ocid="help.sheet"
-          className="max-h-[85vh] rounded-t-2xl border-border/50 bg-card px-0 pb-6"
+          className="max-h-[85vh] rounded-t-2xl border-white/10 bg-zinc-900 px-0 pb-6"
         >
           <SheetHeader className="px-6 pb-4">
-            <SheetTitle className="font-display text-lg font-bold text-foreground">
+            <SheetTitle className="text-lg font-bold text-white">
               Como Usar o Guardião Urbano
             </SheetTitle>
           </SheetHeader>
@@ -324,16 +294,16 @@ export function DashboardPage() {
               {helpSections.map((section) => (
                 <div
                   key={section.title}
-                  className="flex gap-4 rounded-xl border border-border/40 bg-background/60 p-4"
+                  className="flex gap-4 rounded-xl border border-white/10 bg-white/5 p-4"
                 >
                   <span className="mt-0.5 shrink-0 text-2xl">
                     {section.emoji}
                   </span>
                   <div>
-                    <p className="mb-1 text-sm font-semibold text-foreground">
+                    <p className="mb-1 text-sm font-semibold text-white">
                       {section.title}
                     </p>
-                    <p className="text-xs leading-relaxed text-muted-foreground">
+                    <p className="text-xs leading-relaxed text-white/50">
                       {section.desc}
                     </p>
                   </div>
