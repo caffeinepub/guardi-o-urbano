@@ -36,8 +36,21 @@ export function RegisterPage() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-background px-6 py-12">
-      <div className="w-full max-w-sm">
+    <div
+      className="flex min-h-screen flex-col items-center justify-center px-6 py-12"
+      style={{
+        background:
+          "linear-gradient(135deg, oklch(25% 0.18 25) 0%, oklch(18% 0.14 20) 40%, oklch(12% 0.10 15) 100%)",
+      }}
+    >
+      <div
+        className="pointer-events-none fixed inset-0"
+        style={{
+          backgroundImage:
+            "radial-gradient(circle at 30% 40%, oklch(45% 0.22 25 / 0.35) 0%, transparent 55%), radial-gradient(circle at 75% 70%, oklch(35% 0.18 20 / 0.25) 0%, transparent 45%)",
+        }}
+      />
+      <div className="relative z-10 w-full max-w-sm">
         <div className="mb-8 flex flex-col items-center gap-3">
           <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/20">
             <Shield className="h-8 w-8 text-primary" />

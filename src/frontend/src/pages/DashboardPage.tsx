@@ -118,8 +118,21 @@ export function DashboardPage() {
         : "text-yellow-400";
 
   return (
-    <div className="flex min-h-screen flex-col bg-background pb-20">
-      <header className="flex items-center justify-between border-b border-border/50 bg-card/80 px-4 py-3 backdrop-blur-sm">
+    <div
+      className="flex min-h-screen flex-col pb-20"
+      style={{
+        background:
+          "linear-gradient(135deg, oklch(25% 0.18 25) 0%, oklch(18% 0.14 20) 40%, oklch(12% 0.10 15) 100%)",
+      }}
+    >
+      <div
+        className="pointer-events-none fixed inset-0"
+        style={{
+          backgroundImage:
+            "radial-gradient(circle at 30% 40%, oklch(45% 0.22 25 / 0.35) 0%, transparent 55%), radial-gradient(circle at 75% 70%, oklch(35% 0.18 20 / 0.25) 0%, transparent 45%)",
+        }}
+      />
+      <header className="relative z-10 flex items-center justify-between border-b border-border/50 bg-card/80 px-4 py-3 backdrop-blur-sm">
         <div className="flex items-center gap-2">
           <Shield className="h-5 w-5 text-primary" />
           <span className="font-display text-sm font-bold text-foreground">
@@ -138,7 +151,7 @@ export function DashboardPage() {
         </Badge>
       </header>
 
-      <main className="flex flex-1 flex-col gap-6 px-4 pt-6">
+      <main className="relative z-10 flex flex-1 flex-col gap-6 px-4 pt-6">
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -185,7 +198,8 @@ export function DashboardPage() {
           transition={{ delay: 0.2 }}
           className="grid grid-cols-2 gap-3"
         >
-          <div className="rounded-2xl border border-border/50 bg-card p-4">
+          {/* License card with primary left accent */}
+          <div className="rounded-2xl border border-border/50 border-l-2 border-l-primary bg-gradient-to-br from-card to-card/60 p-4">
             <div className="flex items-center gap-2">
               <CheckCircle className={`h-4 w-4 ${licenseColor}`} />
               <span className="text-xs text-muted-foreground">Licença</span>
@@ -202,7 +216,12 @@ export function DashboardPage() {
             )}
           </div>
 
-          <div className="rounded-2xl border border-border/50 bg-card p-4">
+          {/* Location card with green/yellow left accent */}
+          <div
+            className={`rounded-2xl border border-border/50 border-l-2 bg-gradient-to-br from-card to-card/60 p-4 ${
+              location ? "border-l-green-400" : "border-l-yellow-400"
+            }`}
+          >
             <div className="flex items-center gap-2">
               <MapPin
                 className={`h-4 w-4 ${location ? "text-green-400" : "text-yellow-400"}`}
@@ -268,9 +287,9 @@ export function DashboardPage() {
               type="button"
               data-ocid="dashboard.secondary_button"
               onClick={() => navigate({ to })}
-              className="flex flex-col items-center gap-1 rounded-2xl border border-border/50 bg-card p-3 text-xs text-muted-foreground transition-colors hover:bg-accent"
+              className="flex flex-col items-center gap-1 rounded-2xl border border-border/50 bg-card p-3 text-xs text-muted-foreground transition-all hover:border-primary/40 hover:bg-primary/10 hover:text-foreground active:scale-95"
             >
-              <span className="text-2xl">{emoji}</span>
+              <span className="text-3xl">{emoji}</span>
               <span>{label}</span>
             </button>
           ))}

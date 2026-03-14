@@ -31,12 +31,15 @@ export function BottomNav() {
             key={to}
             to={to}
             data-ocid={ocid}
-            className={`flex flex-1 flex-col items-center gap-0.5 py-3 text-xs transition-colors ${
+            className={`relative flex flex-1 flex-col items-center gap-0.5 py-3 text-xs transition-colors ${
               active
                 ? "text-primary"
                 : "text-muted-foreground hover:text-foreground"
             }`}
           >
+            {active && (
+              <span className="absolute top-0 left-1/2 h-[3px] w-8 -translate-x-1/2 rounded-full bg-primary" />
+            )}
             <Icon className={`h-5 w-5 ${active ? "stroke-[2.5px]" : ""}`} />
             <span>{label}</span>
           </Link>

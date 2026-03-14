@@ -97,8 +97,21 @@ export function CommunityPage() {
   const visible = (incidents ?? []).filter((i) => i.status !== "removed");
 
   return (
-    <div className="flex min-h-screen flex-col bg-background pb-20">
-      <header className="border-b border-border/50 bg-card/80 px-4 py-4 backdrop-blur-sm">
+    <div
+      className="flex min-h-screen flex-col pb-20"
+      style={{
+        background:
+          "linear-gradient(135deg, oklch(25% 0.18 25) 0%, oklch(18% 0.14 20) 40%, oklch(12% 0.10 15) 100%)",
+      }}
+    >
+      <div
+        className="pointer-events-none fixed inset-0"
+        style={{
+          backgroundImage:
+            "radial-gradient(circle at 30% 40%, oklch(45% 0.22 25 / 0.35) 0%, transparent 55%), radial-gradient(circle at 75% 70%, oklch(35% 0.18 20 / 0.25) 0%, transparent 45%)",
+        }}
+      />
+      <header className="relative z-10 border-b border-border/50 bg-card/80 px-4 py-4 backdrop-blur-sm">
         <h1 className="font-display text-xl font-bold text-foreground">
           Comunidade
         </h1>
@@ -107,7 +120,7 @@ export function CommunityPage() {
         </p>
       </header>
 
-      <main className="flex-1 space-y-3 px-4 pt-4">
+      <main className="relative z-10 flex-1 space-y-3 px-4 pt-4">
         {visible.length === 0 ? (
           <div
             data-ocid="community.empty_state"

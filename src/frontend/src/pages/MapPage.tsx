@@ -1,37 +1,16 @@
-import L from "leaflet";
-import { useEffect, useState } from "react";
-import { MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
-import "leaflet/dist/leaflet.css";
+import { AlertTriangle, Car, Eye, Flame, Skull } from "lucide-react";
+import { useState } from "react";
 import type { Incident } from "../backend.d";
 import { BottomNav } from "../components/BottomNav";
 import { timeAgo, useIncidents } from "../hooks/useBackend";
 
-(L.Icon.Default.prototype as any)._getIconUrl = undefined;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl:
-    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png",
-  iconUrl:
-    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png",
-  shadowUrl:
-    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png",
-});
-
-function createColorIcon(color: string) {
-  return L.divIcon({
-    className: "",
-    html: `<div style="width:28px;height:28px;background:${color};border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:3px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.4)"></div>`,
-    iconSize: [28, 28],
-    iconAnchor: [14, 28],
-  });
-}
-
 const incidentColors: Record<string, string> = {
-  assault: "#dc2626",
-  accident: "#f97316",
-  suspicious: "#eab308",
-  danger: "#b91c1c",
-  urgent: "#7f1d1d",
-  default: "#6b7280",
+  assault: "text-red-400",
+  accident: "text-orange-400",
+  suspicious: "text-yellow-400",
+  danger: "text-red-600",
+  urgent: "text-red-800",
+  default: "text-muted-foreground",
 };
 
 const incidentLabels: Record<string, string> = {
@@ -40,6 +19,22 @@ const incidentLabels: Record<string, string> = {
   suspicious: "Suspeito",
   danger: "Perigo",
   urgent: "Urgente",
+};
+
+const IncidentIcon = ({ type }: { type: string }) => {
+  const cls = `h-4 w-4 ${incidentColors[type] ?? incidentColors.default}`;
+  switch (type) {
+    case "assault":
+      return <Skull className={cls} />;
+    case "accident":
+      return <Car className={cls} />;
+    case "suspicious":
+      return <Eye className={cls} />;
+    case "danger":
+      return <Flame className={cls} />;
+    default:
+      return <AlertTriangle className={cls} />;
+  }
 };
 
 const FILTERS = [
@@ -59,18 +54,9 @@ const FILTER_LABELS: Record<string, string> = {
   urgent: "Urgente",
 };
 
-function LocateControl() {
-  const map = useMap();
-  useEffect(() => {
-    navigator.geolocation.getCurrentPosition((pos) => {
-      map.setView([pos.coords.latitude, pos.coords.longitude], 14);
-    });
-  }, [map]);
-  return null;
-}
-
 export function MapPage() {
   const [activeFilter, setActiveFilter] = useState("Todos");
+  const [selected, setSelected] = useState<Incident | null>(null);
   const { data: incidents } = useIncidents(
     activeFilter === "Todos" ? null : activeFilter,
   );
@@ -79,8 +65,26 @@ export function MapPage() {
     (i) => i.status !== "removed",
   );
 
+  const mapCenter = selected
+    ? `${selected.lat},${selected.lng}`
+    : "-8.8368,13.2343";
+
   return (
-    <div className="relative flex h-screen flex-col bg-background">
+    <div
+      className="relative flex h-screen flex-col"
+      style={{
+        background:
+          "linear-gradient(135deg, oklch(25% 0.18 25) 0%, oklch(18% 0.14 20) 40%, oklch(12% 0.10 15) 100%)",
+      }}
+    >
+      <div
+        className="pointer-events-none fixed inset-0"
+        style={{
+          backgroundImage:
+            "radial-gradient(circle at 30% 40%, oklch(45% 0.22 25 / 0.35) 0%, transparent 55%), radial-gradient(circle at 75% 70%, oklch(35% 0.18 20 / 0.25) 0%, transparent 45%)",
+        }}
+      />
+      {/* Filter bar */}
       <div className="absolute left-0 right-0 top-0 z-[1000] flex gap-2 overflow-x-auto px-3 py-3 scrollbar-hide">
         {FILTERS.map((f) => (
           <button
@@ -99,47 +103,64 @@ export function MapPage() {
         ))}
       </div>
 
+      {/* Map iframe */}
       <div className="flex-1 pb-16">
-        <MapContainer
-          center={[0, 20]}
-          zoom={3}
-          style={{ height: "100%", width: "100%" }}
-          zoomControl={false}
-        >
-          <TileLayer
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-          />
-          <LocateControl />
-          {visible.map((incident) => (
-            <Marker
-              key={incident.id}
-              position={[incident.lat, incident.lng]}
-              icon={createColorIcon(
-                incidentColors[incident.incidentType] ?? incidentColors.default,
-              )}
-            >
-              <Popup>
-                <div className="min-w-[160px] p-1">
-                  <div className="mb-1 font-semibold">
+        <iframe
+          title="Mapa de Ocorrências"
+          src={`https://www.openstreetmap.org/export/embed.html?bbox=${Number(mapCenter.split(",")[1]) - 0.1},${Number(mapCenter.split(",")[0]) - 0.1},${Number(mapCenter.split(",")[1]) + 0.1},${Number(mapCenter.split(",")[0]) + 0.1}&layer=mapnik&marker=${mapCenter}`}
+          className="h-full w-full border-0"
+          style={{ filter: "invert(0.9) hue-rotate(180deg)" }}
+        />
+      </div>
+
+      {/* Incidents list panel */}
+      {visible.length > 0 && (
+        <div className="absolute bottom-16 left-0 right-0 z-[999] max-h-48 overflow-y-auto border-t border-border/50 bg-card/95 backdrop-blur-md">
+          <div className="flex flex-col gap-0.5 p-2">
+            {visible.map((incident, idx) => (
+              <button
+                key={incident.id}
+                type="button"
+                data-ocid={`map.item.${idx + 1}`}
+                onClick={() =>
+                  setSelected(incident === selected ? null : incident)
+                }
+                className={`flex items-center gap-3 rounded-xl px-3 py-2 text-left transition-colors ${
+                  selected?.id === incident.id
+                    ? "bg-primary/20"
+                    : "hover:bg-accent"
+                }`}
+              >
+                <IncidentIcon type={incident.incidentType} />
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-xs font-semibold text-foreground">
                     {incidentLabels[incident.incidentType] ??
                       incident.incidentType}
-                  </div>
-                  <p className="text-xs text-gray-600">
+                    {incident.neighborhood ? ` · ${incident.neighborhood}` : ""}
+                  </p>
+                  <p className="truncate text-xs text-muted-foreground">
                     {incident.description}
                   </p>
-                  <p className="mt-1 text-xs text-gray-500">
-                    {incident.neighborhood} · {timeAgo(incident.createdAt)}
-                  </p>
-                  <p className="mt-1 text-xs text-gray-500">
-                    ✅ {Number(incident.confirmations)} confirmações
-                  </p>
                 </div>
-              </Popup>
-            </Marker>
-          ))}
-        </MapContainer>
-      </div>
+                <span className="shrink-0 text-xs text-muted-foreground">
+                  {timeAgo(incident.createdAt)}
+                </span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {visible.length === 0 && (
+        <div className="absolute bottom-16 left-0 right-0 z-[999] border-t border-border/50 bg-card/95 px-4 py-3 text-center backdrop-blur-md">
+          <p
+            data-ocid="map.empty_state"
+            className="text-sm text-muted-foreground"
+          >
+            Sem ocorrências registadas nesta área.
+          </p>
+        </div>
+      )}
 
       <BottomNav />
     </div>

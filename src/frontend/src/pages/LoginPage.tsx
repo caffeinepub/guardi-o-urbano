@@ -40,12 +40,19 @@ export function LoginPage() {
     isLoggingIn || (!!identity && (isInitializing || profileLoading));
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-background px-6">
+    <div
+      className="flex min-h-screen flex-col items-center justify-center px-6"
+      style={{
+        background:
+          "linear-gradient(135deg, oklch(25% 0.18 25) 0%, oklch(18% 0.14 20) 40%, oklch(12% 0.10 15) 100%)",
+      }}
+    >
+      {/* Red radial overlay */}
       <div
-        className="pointer-events-none fixed inset-0 opacity-5"
+        className="pointer-events-none fixed inset-0"
         style={{
           backgroundImage:
-            "radial-gradient(circle at 20% 50%, oklch(50% 0.23 27) 0%, transparent 50%), radial-gradient(circle at 80% 20%, oklch(30% 0.1 240) 0%, transparent 40%)",
+            "radial-gradient(circle at 30% 40%, oklch(45% 0.22 25 / 0.35) 0%, transparent 55%), radial-gradient(circle at 75% 70%, oklch(35% 0.18 20 / 0.25) 0%, transparent 45%)",
         }}
       />
 
@@ -56,24 +63,53 @@ export function LoginPage() {
         className="flex w-full max-w-sm flex-col items-center gap-8"
       >
         <div className="relative flex h-24 w-24 items-center justify-center">
-          <div className="absolute inset-0 rounded-2xl bg-primary/20" />
-          <div className="absolute inset-2 rounded-xl bg-primary/30" />
+          <motion.div
+            className="absolute inset-0 rounded-full"
+            style={{ background: "oklch(55% 0.22 25 / 0.25)" }}
+            animate={{ scale: [1, 1.35, 1], opacity: [0.5, 0.15, 0.5] }}
+            transition={{
+              duration: 3,
+              repeat: Number.POSITIVE_INFINITY,
+              ease: "easeInOut",
+            }}
+          />
+          <motion.div
+            className="absolute inset-3 rounded-full"
+            style={{ background: "oklch(55% 0.22 25 / 0.40)" }}
+            animate={{ scale: [1, 1.2, 1], opacity: [0.7, 0.3, 0.7] }}
+            transition={{
+              duration: 3,
+              repeat: Number.POSITIVE_INFINITY,
+              ease: "easeInOut",
+              delay: 0.4,
+            }}
+          />
           <Shield
-            className="relative h-12 w-12 text-primary"
+            className="relative h-12 w-12"
+            style={{ color: "oklch(75% 0.18 25)" }}
             strokeWidth={1.5}
           />
         </div>
 
         <div className="text-center">
-          <h1 className="font-display text-4xl font-bold tracking-tight text-foreground">
+          <h1
+            className="font-display text-4xl font-bold tracking-tight"
+            style={{ color: "oklch(98% 0.005 260)" }}
+          >
             Guardião Urbano
           </h1>
-          <p className="mt-2 text-sm text-muted-foreground">
+          <p className="mt-2 text-sm" style={{ color: "oklch(80% 0.04 30)" }}>
             Segurança da cidade nas mãos da comunidade.
           </p>
         </div>
 
-        <div className="w-full space-y-2 rounded-2xl border border-border/50 bg-card p-4">
+        <div
+          className="w-full space-y-2 rounded-2xl p-4"
+          style={{
+            background: "oklch(15% 0.08 20 / 0.7)",
+            border: "1px solid oklch(35% 0.12 25 / 0.5)",
+          }}
+        >
           {features.map((f, i) => (
             <motion.div
               key={f.text}
@@ -83,7 +119,12 @@ export function LoginPage() {
               className="flex items-center gap-3"
             >
               <span className="text-xl">{f.icon}</span>
-              <span className="text-sm text-muted-foreground">{f.text}</span>
+              <span
+                className="text-sm"
+                style={{ color: "oklch(85% 0.02 260)" }}
+              >
+                {f.text}
+              </span>
             </motion.div>
           ))}
         </div>
@@ -98,7 +139,11 @@ export function LoginPage() {
             data-ocid="login.primary_button"
             onClick={() => login()}
             disabled={isLoading}
-            className="h-14 w-full rounded-2xl bg-primary text-base font-semibold text-primary-foreground transition-all hover:opacity-90 active:scale-[0.98]"
+            className="h-14 w-full rounded-2xl text-base font-semibold transition-all active:scale-[0.98]"
+            style={{
+              background: "oklch(55% 0.22 25)",
+              color: "oklch(98% 0.005 260)",
+            }}
           >
             {isLoading ? (
               <>
@@ -110,18 +155,25 @@ export function LoginPage() {
           </Button>
         </motion.div>
 
-        <p className="text-center text-xs text-muted-foreground">
+        <p
+          className="text-center text-xs"
+          style={{ color: "oklch(70% 0.04 30)" }}
+        >
           Sistema de licenciamento obrigatório.
           <br />
           Necessário código de ativação para acesso.
         </p>
       </motion.div>
 
-      <footer className="absolute bottom-6 text-xs text-muted-foreground">
+      <footer
+        className="absolute bottom-6 text-xs"
+        style={{ color: "oklch(65% 0.04 30)" }}
+      >
         © {new Date().getFullYear()}. Desenvolvido com ❤️ usando{" "}
         <a
           href={`https://caffeine.ai?utm_source=caffeine-footer&utm_medium=referral&utm_content=${encodeURIComponent(window.location.hostname)}`}
-          className="underline hover:text-foreground"
+          className="underline"
+          style={{ color: "oklch(75% 0.08 30)" }}
           target="_blank"
           rel="noopener noreferrer"
         >

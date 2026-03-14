@@ -136,7 +136,7 @@ export function AdminPage() {
       : s === "expired"
         ? "text-destructive"
         : s === "blocked"
-          ? "text-orange-400"
+          ? "text-primary"
           : "text-yellow-400";
 
   return (
@@ -209,7 +209,7 @@ export function AdminPage() {
               <MetricCard
                 label="SOS Ativos"
                 value={Number(metrics?.activeSOSCount ?? 0)}
-                color="text-orange-400"
+                color="text-primary"
               />
               <MetricCard
                 label="Total Ocorrências"
@@ -391,7 +391,7 @@ export function AdminPage() {
                         <Button
                           data-ocid={`admin.secondary_button.${idx + 1}`}
                           size="sm"
-                          className="h-7 bg-blue-600 px-2 text-xs text-white hover:bg-blue-700"
+                          className="h-7 bg-primary px-2 text-xs text-primary-foreground hover:bg-primary/90"
                           onClick={() => {
                             renewLicense(lic.code);
                             toast.success("Renovada!");

@@ -7,43 +7,43 @@
 @layer base {
   :root {
     --background: 0 0 0;
-    --foreground: 97 0.01 260;
-    --card: 15 0.02 240;
-    --card-foreground: 97 0.01 260;
-    --popover: 15 0.02 240;
-    --popover-foreground: 97 0.01 260;
-    --primary: 55 0.22 25;
-    --primary-foreground: 100 0 0;
-    --secondary: 18 0.03 240;
-    --secondary-foreground: 85 0.04 260;
-    --muted: 18 0.03 240;
-    --muted-foreground: 65 0.06 250;
-    --accent: 20 0.04 240;
-    --accent-foreground: 90 0.02 260;
+    --foreground: 98 0.005 260;
+    --card: 18 0.015 240;
+    --card-foreground: 98 0.005 260;
+    --popover: 18 0.015 240;
+    --popover-foreground: 98 0.005 260;
+    --primary: 68 0.22 50;
+    --primary-foreground: 10 0 0;
+    --secondary: 22 0.025 240;
+    --secondary-foreground: 90 0.02 260;
+    --muted: 22 0.025 240;
+    --muted-foreground: 80 0.04 250;
+    --accent: 25 0.03 240;
+    --accent-foreground: 95 0.01 260;
     --destructive: 55 0.22 25;
     --destructive-foreground: 100 0 0;
-    --border: 20 0.04 240;
-    --input: 20 0.04 240;
-    --ring: 55 0.22 25;
+    --border: 28 0.04 240;
+    --input: 28 0.04 240;
+    --ring: 68 0.22 50;
     --radius: 0.75rem;
-    --chart-1: 55 0.22 25;
+    --chart-1: 68 0.22 50;
     --chart-2: 65 0.15 160;
     --chart-3: 70 0.15 220;
     --chart-4: 75 0.18 90;
     --chart-5: 60 0.2 60;
-    --sidebar: 15 0.02 240;
-    --sidebar-foreground: 97 0.01 260;
-    --sidebar-primary: 55 0.22 25;
-    --sidebar-primary-foreground: 100 0 0;
-    --sidebar-accent: 20 0.04 240;
-    --sidebar-accent-foreground: 85 0.04 260;
-    --sidebar-border: 20 0.04 240;
-    --sidebar-ring: 55 0.22 25;
+    --sidebar: 18 0.015 240;
+    --sidebar-foreground: 98 0.005 260;
+    --sidebar-primary: 68 0.22 50;
+    --sidebar-primary-foreground: 10 0 0;
+    --sidebar-accent: 25 0.03 240;
+    --sidebar-accent-foreground: 90 0.02 260;
+    --sidebar-border: 28 0.04 240;
+    --sidebar-ring: 68 0.22 50;
     /* Custom app colors */
     --sos-red: 50 0.23 27;
     --sos-red-light: 60 0.2 27;
-    --navy-deep: 10 0.03 250;
-    --navy-mid: 18 0.04 245;
+    --navy-deep: 12 0.03 250;
+    --navy-mid: 20 0.04 245;
     --safe-green: 65 0.18 145;
     --warning-amber: 72 0.2 65;
   }
@@ -56,6 +56,35 @@
   body {
     @apply bg-background text-foreground font-body;
     -webkit-font-smoothing: antialiased;
+  }
+
+  /* Ensure all text is visible on dark backgrounds */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    color: oklch(98% 0.005 260);
+  }
+
+  p,
+  span,
+  label,
+  li {
+    color: inherit;
+  }
+
+  input,
+  textarea,
+  select {
+    color: oklch(98% 0.005 260);
+    background-color: oklch(18% 0.015 240);
+  }
+
+  input::placeholder,
+  textarea::placeholder {
+    color: oklch(65% 0.04 250);
   }
 }
 
@@ -94,4 +123,31 @@
 .leaflet-container {
   background: oklch(5% 0 0);
   font-family: inherit;
+}
+
+/* Leaflet popup text visibility */
+.leaflet-popup-content-wrapper {
+  background: oklch(18% 0.015 240);
+  color: oklch(98% 0.005 260);
+  border: 1px solid oklch(28% 0.04 240);
+}
+
+.leaflet-popup-tip {
+  background: oklch(18% 0.015 240);
+}
+
+.leaflet-popup-content {
+  color: oklch(98% 0.005 260);
+}
+
+/* Badge and chip text visibility */
+.badge,
+[class*="badge"] {
+  color: oklch(98% 0.005 260);
+}
+
+/* Ensure card content is visible */
+.card-title,
+.card-description {
+  color: oklch(98% 0.005 260);
 }

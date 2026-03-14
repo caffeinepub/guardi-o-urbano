@@ -8,8 +8,21 @@ export function ExpiredPage() {
   const { data: profile } = useProfile();
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-background px-6">
-      <div className="flex w-full max-w-sm flex-col items-center gap-6 text-center">
+    <div
+      className="flex min-h-screen flex-col items-center justify-center px-6"
+      style={{
+        background:
+          "linear-gradient(135deg, oklch(25% 0.18 25) 0%, oklch(18% 0.14 20) 40%, oklch(12% 0.10 15) 100%)",
+      }}
+    >
+      <div
+        className="pointer-events-none fixed inset-0"
+        style={{
+          backgroundImage:
+            "radial-gradient(circle at 30% 40%, oklch(45% 0.22 25 / 0.35) 0%, transparent 55%), radial-gradient(circle at 75% 70%, oklch(35% 0.18 20 / 0.25) 0%, transparent 45%)",
+        }}
+      />
+      <div className="relative z-10 flex w-full max-w-sm flex-col items-center gap-6 text-center">
         <div className="flex h-24 w-24 items-center justify-center rounded-3xl bg-destructive/20">
           <ShieldX className="h-12 w-12 text-destructive" />
         </div>

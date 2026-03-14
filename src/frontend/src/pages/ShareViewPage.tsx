@@ -1,20 +1,6 @@
-import L from "leaflet";
-import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
-import "leaflet/dist/leaflet.css";
 import { useParams } from "@tanstack/react-router";
 import { MapPin, RefreshCw } from "lucide-react";
 import { timeAgo, useGetLocationShare } from "../hooks/useBackend";
-
-// Fix Leaflet icons
-(L.Icon.Default.prototype as any)._getIconUrl = undefined;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl:
-    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png",
-  iconUrl:
-    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png",
-  shadowUrl:
-    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png",
-});
 
 export function ShareViewPage() {
   const { id } = useParams({ from: "/share/$id" });
@@ -47,6 +33,8 @@ export function ShareViewPage() {
     );
   }
 
+  const bbox = `${share.lng - 0.008},${share.lat - 0.008},${share.lng + 0.008},${share.lat + 0.008}`;
+
   return (
     <div className="flex h-screen flex-col bg-background">
       <div className="border-b border-border/50 bg-card/90 px-4 py-3 backdrop-blur-sm">
@@ -70,19 +58,12 @@ export function ShareViewPage() {
       </div>
 
       <div className="flex-1">
-        <MapContainer
-          center={[share.lat, share.lng]}
-          zoom={15}
-          style={{ height: "100%", width: "100%" }}
-        >
-          <TileLayer
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-          />
-          <Marker position={[share.lat, share.lng]}>
-            <Popup>{share.ownerName}</Popup>
-          </Marker>
-        </MapContainer>
+        <iframe
+          title="Localização partilhada"
+          src={`https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${share.lat},${share.lng}`}
+          className="h-full w-full border-0"
+          style={{ filter: "invert(0.9) hue-rotate(180deg)" }}
+        />
       </div>
 
       <div className="border-t border-border/50 bg-card/80 px-4 py-2 text-center text-xs text-muted-foreground">
