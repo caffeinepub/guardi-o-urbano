@@ -1,10 +1,7 @@
-import { Button } from "@/components/ui/button";
 import { useNavigate } from "@tanstack/react-router";
-import { Loader2, Shield } from "lucide-react";
+import { Shield } from "lucide-react";
 import { motion } from "motion/react";
 import { useEffect } from "react";
-import { useProfile } from "../hooks/useBackend";
-import { useInternetIdentity } from "../hooks/useInternetIdentity";
 
 const features = [
   { icon: "🚨", text: "Alertas SOS em tempo real" },
@@ -14,30 +11,11 @@ const features = [
 ];
 
 export function LoginPage() {
-  const { login, isLoggingIn, identity, isInitializing } =
-    useInternetIdentity();
   const navigate = useNavigate();
-  const { data: profile, isLoading: profileLoading } = useProfile();
 
   useEffect(() => {
-    if (!identity || isInitializing) return;
-    if (profileLoading) return;
-    if (profile === null) {
-      navigate({ to: "/register" });
-    } else if (profile) {
-      if (
-        profile.licenseStatus === "expired" ||
-        profile.licenseStatus === "blocked"
-      ) {
-        navigate({ to: "/expired" });
-      } else {
-        navigate({ to: "/dashboard" });
-      }
-    }
-  }, [identity, isInitializing, profile, profileLoading, navigate]);
-
-  const isLoading =
-    isLoggingIn || (!!identity && (isInitializing || profileLoading));
+    navigate({ to: "/register" });
+  }, [navigate]);
 
   return (
     <div
@@ -47,7 +25,6 @@ export function LoginPage() {
           "linear-gradient(135deg, oklch(25% 0.18 25) 0%, oklch(18% 0.14 20) 40%, oklch(12% 0.10 15) 100%)",
       }}
     >
-      {/* Red radial overlay */}
       <div
         className="pointer-events-none fixed inset-0"
         style={{
@@ -59,7 +36,7 @@ export function LoginPage() {
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
+        transition={{ duration: 0.4 }}
         className="flex w-full max-w-sm flex-col items-center gap-8"
       >
         <div className="relative flex h-24 w-24 items-center justify-center">
@@ -115,7 +92,7 @@ export function LoginPage() {
               key={f.text}
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.3 + i * 0.1 }}
+              transition={{ delay: 0.2 + i * 0.1 }}
               className="flex items-center gap-3"
             >
               <span className="text-xl">{f.icon}</span>
@@ -128,32 +105,6 @@ export function LoginPage() {
             </motion.div>
           ))}
         </div>
-
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.7 }}
-          className="w-full"
-        >
-          <Button
-            data-ocid="login.primary_button"
-            onClick={() => login()}
-            disabled={isLoading}
-            className="h-14 w-full rounded-2xl text-base font-semibold transition-all active:scale-[0.98]"
-            style={{
-              background: "oklch(55% 0.22 25)",
-              color: "oklch(98% 0.005 260)",
-            }}
-          >
-            {isLoading ? (
-              <>
-                <Loader2 className="mr-2 h-5 w-5 animate-spin" /> A carregar...
-              </>
-            ) : (
-              "Entrar com Internet Identity"
-            )}
-          </Button>
-        </motion.div>
 
         <p
           className="text-center text-xs"

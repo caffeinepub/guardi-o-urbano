@@ -35,6 +35,7 @@ import {
   AlertTriangle,
   CheckCircle,
   FileText,
+  KeyRound,
   Lock,
   LogOut,
   MapPin,
@@ -50,7 +51,7 @@ import {
   Zap,
 } from "lucide-react";
 import { motion } from "motion/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 const ADMIN_PASSWORD = "GUARDIAN-REMOT-1003";
@@ -60,6 +61,25 @@ const gradientBg = {
   background: "linear-gradient(135deg, #2d0000 0%, #1a0000 50%, #0d0000 100%)",
   minHeight: "100vh",
 };
+
+function generateLicenseCode(name: string, phone: string): string {
+  const initials = name
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 3)
+    .map((w) => w[0].toUpperCase())
+    .join("");
+
+  const digits = phone.replace(/\D/g, "");
+  const last4 = digits.slice(-4) || "0000";
+
+  const year = new Date().getFullYear();
+
+  if (!initials) return "";
+  const rand = Math.random().toString(36).slice(2, 5).toUpperCase();
+  return `GU-${initials}-${last4}-${year}-${rand}`;
+}
 
 // --- Login Gate ---
 function LoginGate({ onAuth }: { onAuth: () => void }) {
@@ -182,9 +202,13 @@ function CreateLicenseDialog() {
   const [phone, setPhone] = useState("");
   const create = useAdminCreateLicense();
 
+  useEffect(() => {
+    setCode(generateLicenseCode(clientName, phone));
+  }, [clientName, phone]);
+
   async function handleCreate() {
     if (!code || !clientName || !phone) {
-      toast.error("Preenche todos os campos");
+      toast.error("Preenche o nome e o telefone para gerar o código");
       return;
     }
     try {
@@ -194,8 +218,16 @@ function CreateLicenseDialog() {
       setCode("");
       setClientName("");
       setPhone("");
-    } catch {
-      toast.error("Erro ao criar licença");
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      if (msg.includes("already exists")) {
+        toast.error(
+          "Código já existe. Tenta novamente para gerar um novo código.",
+        );
+        setCode(generateLicenseCode(clientName, phone));
+      } else {
+        toast.error(`Erro ao criar licença: ${msg}`);
+      }
     }
   }
 
@@ -220,22 +252,13 @@ function CreateLicenseDialog() {
         </DialogHeader>
         <div className="space-y-3 py-2">
           <div>
-            <Label className="text-white/70 text-xs">Código</Label>
-            <Input
-              data-ocid="remote_admin.license.input"
-              value={code}
-              onChange={(e) => setCode(e.target.value)}
-              placeholder="LIC-2026-XXXX"
-              className="bg-red-950/20 border-red-900/30 text-white mt-1"
-            />
-          </div>
-          <div>
             <Label className="text-white/70 text-xs">Nome do Cliente</Label>
             <Input
+              data-ocid="remote_admin.license.input"
               value={clientName}
               onChange={(e) => setClientName(e.target.value)}
               placeholder="Nome completo"
-              className="bg-red-950/20 border-red-900/30 text-white mt-1"
+              className="bg-black border-red-900/30 text-white mt-1"
             />
           </div>
           <div>
@@ -244,8 +267,27 @@ function CreateLicenseDialog() {
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               placeholder="+258 84 000 0000"
-              className="bg-red-950/20 border-red-900/30 text-white mt-1"
+              className="bg-black border-red-900/30 text-white mt-1"
             />
+          </div>
+          <div>
+            <Label className="text-white/70 text-xs flex items-center gap-1.5">
+              <KeyRound className="w-3 h-3 text-orange-400" />
+              Código Gerado Automaticamente
+            </Label>
+            <div className="relative mt-1">
+              <Input
+                readOnly
+                value={code}
+                placeholder="Preenche o nome para gerar o código"
+                className="bg-zinc-900 border-orange-600/30 text-orange-300 font-mono placeholder:text-white/20 cursor-default"
+              />
+            </div>
+            {code && (
+              <p className="text-white/30 text-xs mt-1">
+                Este código será usado para ativar a licença.
+              </p>
+            )}
           </div>
         </div>
         <DialogFooter>
@@ -260,10 +302,10 @@ function CreateLicenseDialog() {
           <Button
             data-ocid="remote_admin.license.confirm_button"
             onClick={handleCreate}
-            disabled={create.isPending}
+            disabled={create.isPending || !code}
             className="bg-orange-600 hover:bg-orange-500 text-white"
           >
-            {create.isPending ? "A criar..." : "Criar"}
+            {create.isPending ? "A criar..." : "Criar Licença"}
           </Button>
         </DialogFooter>
       </DialogContent>
