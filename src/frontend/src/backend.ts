@@ -137,9 +137,12 @@ export interface LocationShare {
 export interface UserProfile {
     id: Principal;
     licenseStatus: string;
+    neighborhood: string;
+    isBlocked: boolean;
     name: string;
     licenseCode: string;
     isAdmin: boolean;
+    phone: string;
     registrationDate: bigint;
     licenseExpiry: bigint;
     licenseStart: bigint;
@@ -160,9 +163,23 @@ export enum UserRole {
 export interface backendInterface {
     _initializeAccessControlWithSecret(userSecret: string): Promise<void>;
     activateLicense(code: string): Promise<void>;
+    adminActivateLicense(token: string, code: string): Promise<void>;
+    adminBlockLicense(token: string, code: string): Promise<void>;
+    adminBlockUser(token: string, userId: Principal): Promise<void>;
+    adminCreateLicense(token: string, code: string, clientName: string, phone: string): Promise<void>;
+    adminGetMetrics(token: string): Promise<Metrics>;
+    adminListActiveSOSAlerts(token: string): Promise<Array<SOSAlert>>;
+    adminListIncidents(token: string): Promise<Array<Incident>>;
+    adminListLicenses(token: string): Promise<Array<License>>;
+    adminListUsers(token: string): Promise<Array<UserProfile>>;
+    adminRemoveIncident(token: string, id: string): Promise<void>;
+    adminRenewLicense(token: string, code: string): Promise<void>;
+    adminUnblockUser(token: string, userId: Principal): Promise<void>;
+    adminValidateIncident(token: string, id: string): Promise<void>;
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
     blockLicense(code: string): Promise<void>;
     blockUser(userId: Principal): Promise<void>;
+    checkCallerAdminStatus(): Promise<boolean>;
     checkLicenseValidity(code: string): Promise<string>;
     confirmIncident(id: string): Promise<void>;
     createIncident(userName: string, incidentType: string, description: string, lat: number, lng: number, neighborhood: string): Promise<string>;
@@ -228,6 +245,188 @@ export class Backend implements backendInterface {
             return result;
         }
     }
+    async adminActivateLicense(arg0: string, arg1: string): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.adminActivateLicense(arg0, arg1);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.adminActivateLicense(arg0, arg1);
+            return result;
+        }
+    }
+    async adminBlockLicense(arg0: string, arg1: string): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.adminBlockLicense(arg0, arg1);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.adminBlockLicense(arg0, arg1);
+            return result;
+        }
+    }
+    async adminBlockUser(arg0: string, arg1: Principal): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.adminBlockUser(arg0, arg1);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.adminBlockUser(arg0, arg1);
+            return result;
+        }
+    }
+    async adminCreateLicense(arg0: string, arg1: string, arg2: string, arg3: string): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.adminCreateLicense(arg0, arg1, arg2, arg3);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.adminCreateLicense(arg0, arg1, arg2, arg3);
+            return result;
+        }
+    }
+    async adminGetMetrics(arg0: string): Promise<Metrics> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.adminGetMetrics(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.adminGetMetrics(arg0);
+            return result;
+        }
+    }
+    async adminListActiveSOSAlerts(arg0: string): Promise<Array<SOSAlert>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.adminListActiveSOSAlerts(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.adminListActiveSOSAlerts(arg0);
+            return result;
+        }
+    }
+    async adminListIncidents(arg0: string): Promise<Array<Incident>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.adminListIncidents(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.adminListIncidents(arg0);
+            return result;
+        }
+    }
+    async adminListLicenses(arg0: string): Promise<Array<License>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.adminListLicenses(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.adminListLicenses(arg0);
+            return result;
+        }
+    }
+    async adminListUsers(arg0: string): Promise<Array<UserProfile>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.adminListUsers(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.adminListUsers(arg0);
+            return result;
+        }
+    }
+    async adminRemoveIncident(arg0: string, arg1: string): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.adminRemoveIncident(arg0, arg1);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.adminRemoveIncident(arg0, arg1);
+            return result;
+        }
+    }
+    async adminRenewLicense(arg0: string, arg1: string): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.adminRenewLicense(arg0, arg1);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.adminRenewLicense(arg0, arg1);
+            return result;
+        }
+    }
+    async adminUnblockUser(arg0: string, arg1: Principal): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.adminUnblockUser(arg0, arg1);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.adminUnblockUser(arg0, arg1);
+            return result;
+        }
+    }
+    async adminValidateIncident(arg0: string, arg1: string): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.adminValidateIncident(arg0, arg1);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.adminValidateIncident(arg0, arg1);
+            return result;
+        }
+    }
     async assignCallerUserRole(arg0: Principal, arg1: UserRole): Promise<void> {
         if (this.processError) {
             try {
@@ -267,6 +466,20 @@ export class Backend implements backendInterface {
             }
         } else {
             const result = await this.actor.blockUser(arg0);
+            return result;
+        }
+    }
+    async checkCallerAdminStatus(): Promise<boolean> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.checkCallerAdminStatus();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.checkCallerAdminStatus();
             return result;
         }
     }

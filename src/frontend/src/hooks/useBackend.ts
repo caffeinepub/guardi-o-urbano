@@ -439,3 +439,200 @@ export function timeAgo(ns: bigint): string {
   if (diff < 86400000) return `há ${Math.floor(diff / 3600000)} h`;
   return `há ${Math.floor(diff / 86400000)} dias`;
 }
+
+// ============================================================
+// TOKEN-BASED ADMIN HOOKS (for remote admin panel)
+// ============================================================
+
+const REMOTE_TOKEN = "GUARDIAN-REMOT-1003";
+
+export function useAdminAllLicenses() {
+  const { actor, isFetching } = useActor();
+  return useQuery<License[]>({
+    queryKey: ["admin-licenses"],
+    queryFn: async () => {
+      if (!actor) return [];
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return (actor as any).adminListLicenses(REMOTE_TOKEN);
+    },
+    enabled: !!actor && !isFetching,
+    refetchInterval: 10000,
+  });
+}
+
+export function useAdminAllUsers() {
+  const { actor, isFetching } = useActor();
+  return useQuery<UserProfile[]>({
+    queryKey: ["admin-users"],
+    queryFn: async () => {
+      if (!actor) return [];
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return (actor as any).adminListUsers(REMOTE_TOKEN);
+    },
+    enabled: !!actor && !isFetching,
+    refetchInterval: 15000,
+  });
+}
+
+export function useAdminMetrics() {
+  const { actor, isFetching } = useActor();
+  return useQuery<Metrics>({
+    queryKey: ["admin-metrics"],
+    queryFn: async () => {
+      if (!actor) throw new Error("No actor");
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return (actor as any).adminGetMetrics(REMOTE_TOKEN);
+    },
+    enabled: !!actor && !isFetching,
+    refetchInterval: 30000,
+  });
+}
+
+export function useAdminActiveSOSAlerts() {
+  const { actor, isFetching } = useActor();
+  return useQuery<SOSAlert[]>({
+    queryKey: ["admin-sos"],
+    queryFn: async () => {
+      if (!actor) return [];
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return (actor as any).adminListActiveSOSAlerts(REMOTE_TOKEN);
+    },
+    enabled: !!actor && !isFetching,
+    refetchInterval: 5000,
+  });
+}
+
+export function useAdminIncidents() {
+  const { actor, isFetching } = useActor();
+  return useQuery<Incident[]>({
+    queryKey: ["admin-incidents"],
+    queryFn: async () => {
+      if (!actor) return [];
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return (actor as any).adminListIncidents(REMOTE_TOKEN);
+    },
+    enabled: !!actor && !isFetching,
+    refetchInterval: 15000,
+  });
+}
+
+export function useAdminCreateLicense() {
+  const { actor } = useActor();
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({
+      code,
+      clientName,
+      phone,
+    }: { code: string; clientName: string; phone: string }) => {
+      if (!actor) throw new Error("No actor");
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return (actor as any).adminCreateLicense(
+        REMOTE_TOKEN,
+        code,
+        clientName,
+        phone,
+      );
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["admin-licenses"] }),
+  });
+}
+
+export function useAdminActivateLicense() {
+  const { actor } = useActor();
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (code: string) => {
+      if (!actor) throw new Error("No actor");
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return (actor as any).adminActivateLicense(REMOTE_TOKEN, code);
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["admin-licenses"] }),
+  });
+}
+
+export function useAdminRenewLicense() {
+  const { actor } = useActor();
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (code: string) => {
+      if (!actor) throw new Error("No actor");
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return (actor as any).adminRenewLicense(REMOTE_TOKEN, code);
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["admin-licenses"] }),
+  });
+}
+
+export function useAdminBlockLicense() {
+  const { actor } = useActor();
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (code: string) => {
+      if (!actor) throw new Error("No actor");
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return (actor as any).adminBlockLicense(REMOTE_TOKEN, code);
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["admin-licenses"] }),
+  });
+}
+
+export function useAdminBlockUser() {
+  const { actor } = useActor();
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (userId: string) => {
+      if (!actor) throw new Error("No actor");
+      const { Principal } = await import("@icp-sdk/core/principal");
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return (actor as any).adminBlockUser(
+        REMOTE_TOKEN,
+        Principal.fromText(userId),
+      );
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["admin-users"] }),
+  });
+}
+
+export function useAdminUnblockUser() {
+  const { actor } = useActor();
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (userId: string) => {
+      if (!actor) throw new Error("No actor");
+      const { Principal } = await import("@icp-sdk/core/principal");
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return (actor as any).adminUnblockUser(
+        REMOTE_TOKEN,
+        Principal.fromText(userId),
+      );
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["admin-users"] }),
+  });
+}
+
+export function useAdminValidateIncident() {
+  const { actor } = useActor();
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      if (!actor) throw new Error("No actor");
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return (actor as any).adminValidateIncident(REMOTE_TOKEN, id);
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["admin-incidents"] }),
+  });
+}
+
+export function useAdminRemoveIncident() {
+  const { actor } = useActor();
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      if (!actor) throw new Error("No actor");
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return (actor as any).adminRemoveIncident(REMOTE_TOKEN, id);
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["admin-incidents"] }),
+  });
+}

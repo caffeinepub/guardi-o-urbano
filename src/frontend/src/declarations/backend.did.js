@@ -8,47 +8,6 @@
 
 import { IDL } from '@icp-sdk/core/candid';
 
-export const UserRole = IDL.Variant({
-  'admin' : IDL.Null,
-  'user' : IDL.Null,
-  'guest' : IDL.Null,
-});
-export const UserProfile = IDL.Record({
-  'id' : IDL.Principal,
-  'licenseStatus' : IDL.Text,
-  'name' : IDL.Text,
-  'licenseCode' : IDL.Text,
-  'isAdmin' : IDL.Bool,
-  'registrationDate' : IDL.Int,
-  'licenseExpiry' : IDL.Int,
-  'licenseStart' : IDL.Int,
-});
-export const Incident = IDL.Record({
-  'id' : IDL.Text,
-  'lat' : IDL.Float64,
-  'lng' : IDL.Float64,
-  'confirmations' : IDL.Nat,
-  'status' : IDL.Text,
-  'userName' : IDL.Text,
-  'userId' : IDL.Principal,
-  'neighborhood' : IDL.Text,
-  'createdAt' : IDL.Int,
-  'description' : IDL.Text,
-  'adminValidated' : IDL.Bool,
-  'falseReports' : IDL.Nat,
-  'incidentType' : IDL.Text,
-});
-export const LocationShare = IDL.Record({
-  'id' : IDL.Text,
-  'lat' : IDL.Float64,
-  'lng' : IDL.Float64,
-  'ownerName' : IDL.Text,
-  'ownerId' : IDL.Principal,
-  'lastUpdate' : IDL.Int,
-  'description' : IDL.Opt(IDL.Text),
-  'isActive' : IDL.Bool,
-  'shareLink' : IDL.Text,
-});
 export const Metrics = IDL.Record({
   'expiredLicenses' : IDL.Nat,
   'activeLicenses' : IDL.Nat,
@@ -68,6 +27,21 @@ export const SOSAlert = IDL.Record({
   'neighborhood' : IDL.Text,
   'lastLocationUpdate' : IDL.Int,
 });
+export const Incident = IDL.Record({
+  'id' : IDL.Text,
+  'lat' : IDL.Float64,
+  'lng' : IDL.Float64,
+  'confirmations' : IDL.Nat,
+  'status' : IDL.Text,
+  'userName' : IDL.Text,
+  'userId' : IDL.Principal,
+  'neighborhood' : IDL.Text,
+  'createdAt' : IDL.Int,
+  'description' : IDL.Text,
+  'adminValidated' : IDL.Bool,
+  'falseReports' : IDL.Nat,
+  'incidentType' : IDL.Text,
+});
 export const License = IDL.Record({
   'status' : IDL.Text,
   'clientName' : IDL.Text,
@@ -76,13 +50,64 @@ export const License = IDL.Record({
   'activationDate' : IDL.Int,
   'assignedPhone' : IDL.Text,
 });
+export const UserProfile = IDL.Record({
+  'id' : IDL.Principal,
+  'licenseStatus' : IDL.Text,
+  'neighborhood' : IDL.Text,
+  'isBlocked' : IDL.Bool,
+  'name' : IDL.Text,
+  'licenseCode' : IDL.Text,
+  'isAdmin' : IDL.Bool,
+  'phone' : IDL.Text,
+  'registrationDate' : IDL.Int,
+  'licenseExpiry' : IDL.Int,
+  'licenseStart' : IDL.Int,
+});
+export const UserRole = IDL.Variant({
+  'admin' : IDL.Null,
+  'user' : IDL.Null,
+  'guest' : IDL.Null,
+});
+export const LocationShare = IDL.Record({
+  'id' : IDL.Text,
+  'lat' : IDL.Float64,
+  'lng' : IDL.Float64,
+  'ownerName' : IDL.Text,
+  'ownerId' : IDL.Principal,
+  'lastUpdate' : IDL.Int,
+  'description' : IDL.Opt(IDL.Text),
+  'isActive' : IDL.Bool,
+  'shareLink' : IDL.Text,
+});
 
 export const idlService = IDL.Service({
   '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
   'activateLicense' : IDL.Func([IDL.Text], [], []),
+  'adminActivateLicense' : IDL.Func([IDL.Text, IDL.Text], [], []),
+  'adminBlockLicense' : IDL.Func([IDL.Text, IDL.Text], [], []),
+  'adminBlockUser' : IDL.Func([IDL.Text, IDL.Principal], [], []),
+  'adminCreateLicense' : IDL.Func(
+      [IDL.Text, IDL.Text, IDL.Text, IDL.Text],
+      [],
+      [],
+    ),
+  'adminGetMetrics' : IDL.Func([IDL.Text], [Metrics], ['query']),
+  'adminListActiveSOSAlerts' : IDL.Func(
+      [IDL.Text],
+      [IDL.Vec(SOSAlert)],
+      ['query'],
+    ),
+  'adminListIncidents' : IDL.Func([IDL.Text], [IDL.Vec(Incident)], ['query']),
+  'adminListLicenses' : IDL.Func([IDL.Text], [IDL.Vec(License)], ['query']),
+  'adminListUsers' : IDL.Func([IDL.Text], [IDL.Vec(UserProfile)], ['query']),
+  'adminRemoveIncident' : IDL.Func([IDL.Text, IDL.Text], [], []),
+  'adminRenewLicense' : IDL.Func([IDL.Text, IDL.Text], [], []),
+  'adminUnblockUser' : IDL.Func([IDL.Text, IDL.Principal], [], []),
+  'adminValidateIncident' : IDL.Func([IDL.Text, IDL.Text], [], []),
   'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
   'blockLicense' : IDL.Func([IDL.Text], [], []),
   'blockUser' : IDL.Func([IDL.Principal], [], []),
+  'checkCallerAdminStatus' : IDL.Func([], [IDL.Bool], ['query']),
   'checkLicenseValidity' : IDL.Func([IDL.Text], [IDL.Text], ['query']),
   'confirmIncident' : IDL.Func([IDL.Text], [], []),
   'createIncident' : IDL.Func(
@@ -149,47 +174,6 @@ export const idlService = IDL.Service({
 export const idlInitArgs = [];
 
 export const idlFactory = ({ IDL }) => {
-  const UserRole = IDL.Variant({
-    'admin' : IDL.Null,
-    'user' : IDL.Null,
-    'guest' : IDL.Null,
-  });
-  const UserProfile = IDL.Record({
-    'id' : IDL.Principal,
-    'licenseStatus' : IDL.Text,
-    'name' : IDL.Text,
-    'licenseCode' : IDL.Text,
-    'isAdmin' : IDL.Bool,
-    'registrationDate' : IDL.Int,
-    'licenseExpiry' : IDL.Int,
-    'licenseStart' : IDL.Int,
-  });
-  const Incident = IDL.Record({
-    'id' : IDL.Text,
-    'lat' : IDL.Float64,
-    'lng' : IDL.Float64,
-    'confirmations' : IDL.Nat,
-    'status' : IDL.Text,
-    'userName' : IDL.Text,
-    'userId' : IDL.Principal,
-    'neighborhood' : IDL.Text,
-    'createdAt' : IDL.Int,
-    'description' : IDL.Text,
-    'adminValidated' : IDL.Bool,
-    'falseReports' : IDL.Nat,
-    'incidentType' : IDL.Text,
-  });
-  const LocationShare = IDL.Record({
-    'id' : IDL.Text,
-    'lat' : IDL.Float64,
-    'lng' : IDL.Float64,
-    'ownerName' : IDL.Text,
-    'ownerId' : IDL.Principal,
-    'lastUpdate' : IDL.Int,
-    'description' : IDL.Opt(IDL.Text),
-    'isActive' : IDL.Bool,
-    'shareLink' : IDL.Text,
-  });
   const Metrics = IDL.Record({
     'expiredLicenses' : IDL.Nat,
     'activeLicenses' : IDL.Nat,
@@ -209,6 +193,21 @@ export const idlFactory = ({ IDL }) => {
     'neighborhood' : IDL.Text,
     'lastLocationUpdate' : IDL.Int,
   });
+  const Incident = IDL.Record({
+    'id' : IDL.Text,
+    'lat' : IDL.Float64,
+    'lng' : IDL.Float64,
+    'confirmations' : IDL.Nat,
+    'status' : IDL.Text,
+    'userName' : IDL.Text,
+    'userId' : IDL.Principal,
+    'neighborhood' : IDL.Text,
+    'createdAt' : IDL.Int,
+    'description' : IDL.Text,
+    'adminValidated' : IDL.Bool,
+    'falseReports' : IDL.Nat,
+    'incidentType' : IDL.Text,
+  });
   const License = IDL.Record({
     'status' : IDL.Text,
     'clientName' : IDL.Text,
@@ -217,13 +216,64 @@ export const idlFactory = ({ IDL }) => {
     'activationDate' : IDL.Int,
     'assignedPhone' : IDL.Text,
   });
+  const UserProfile = IDL.Record({
+    'id' : IDL.Principal,
+    'licenseStatus' : IDL.Text,
+    'neighborhood' : IDL.Text,
+    'isBlocked' : IDL.Bool,
+    'name' : IDL.Text,
+    'licenseCode' : IDL.Text,
+    'isAdmin' : IDL.Bool,
+    'phone' : IDL.Text,
+    'registrationDate' : IDL.Int,
+    'licenseExpiry' : IDL.Int,
+    'licenseStart' : IDL.Int,
+  });
+  const UserRole = IDL.Variant({
+    'admin' : IDL.Null,
+    'user' : IDL.Null,
+    'guest' : IDL.Null,
+  });
+  const LocationShare = IDL.Record({
+    'id' : IDL.Text,
+    'lat' : IDL.Float64,
+    'lng' : IDL.Float64,
+    'ownerName' : IDL.Text,
+    'ownerId' : IDL.Principal,
+    'lastUpdate' : IDL.Int,
+    'description' : IDL.Opt(IDL.Text),
+    'isActive' : IDL.Bool,
+    'shareLink' : IDL.Text,
+  });
   
   return IDL.Service({
     '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
     'activateLicense' : IDL.Func([IDL.Text], [], []),
+    'adminActivateLicense' : IDL.Func([IDL.Text, IDL.Text], [], []),
+    'adminBlockLicense' : IDL.Func([IDL.Text, IDL.Text], [], []),
+    'adminBlockUser' : IDL.Func([IDL.Text, IDL.Principal], [], []),
+    'adminCreateLicense' : IDL.Func(
+        [IDL.Text, IDL.Text, IDL.Text, IDL.Text],
+        [],
+        [],
+      ),
+    'adminGetMetrics' : IDL.Func([IDL.Text], [Metrics], ['query']),
+    'adminListActiveSOSAlerts' : IDL.Func(
+        [IDL.Text],
+        [IDL.Vec(SOSAlert)],
+        ['query'],
+      ),
+    'adminListIncidents' : IDL.Func([IDL.Text], [IDL.Vec(Incident)], ['query']),
+    'adminListLicenses' : IDL.Func([IDL.Text], [IDL.Vec(License)], ['query']),
+    'adminListUsers' : IDL.Func([IDL.Text], [IDL.Vec(UserProfile)], ['query']),
+    'adminRemoveIncident' : IDL.Func([IDL.Text, IDL.Text], [], []),
+    'adminRenewLicense' : IDL.Func([IDL.Text, IDL.Text], [], []),
+    'adminUnblockUser' : IDL.Func([IDL.Text, IDL.Principal], [], []),
+    'adminValidateIncident' : IDL.Func([IDL.Text, IDL.Text], [], []),
     'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
     'blockLicense' : IDL.Func([IDL.Text], [], []),
     'blockUser' : IDL.Func([IDL.Principal], [], []),
+    'checkCallerAdminStatus' : IDL.Func([], [IDL.Bool], ['query']),
     'checkLicenseValidity' : IDL.Func([IDL.Text], [IDL.Text], ['query']),
     'confirmIncident' : IDL.Func([IDL.Text], [], []),
     'createIncident' : IDL.Func(

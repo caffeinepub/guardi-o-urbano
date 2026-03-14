@@ -55,9 +55,12 @@ export interface LocationShare {
 export interface UserProfile {
     id: Principal;
     licenseStatus: string;
+    neighborhood: string;
+    isBlocked: boolean;
     name: string;
     licenseCode: string;
     isAdmin: boolean;
+    phone: string;
     registrationDate: bigint;
     licenseExpiry: bigint;
     licenseStart: bigint;
@@ -77,9 +80,23 @@ export enum UserRole {
 }
 export interface backendInterface {
     activateLicense(code: string): Promise<void>;
+    adminActivateLicense(token: string, code: string): Promise<void>;
+    adminBlockLicense(token: string, code: string): Promise<void>;
+    adminBlockUser(token: string, userId: Principal): Promise<void>;
+    adminCreateLicense(token: string, code: string, clientName: string, phone: string): Promise<void>;
+    adminGetMetrics(token: string): Promise<Metrics>;
+    adminListActiveSOSAlerts(token: string): Promise<Array<SOSAlert>>;
+    adminListIncidents(token: string): Promise<Array<Incident>>;
+    adminListLicenses(token: string): Promise<Array<License>>;
+    adminListUsers(token: string): Promise<Array<UserProfile>>;
+    adminRemoveIncident(token: string, id: string): Promise<void>;
+    adminRenewLicense(token: string, code: string): Promise<void>;
+    adminUnblockUser(token: string, userId: Principal): Promise<void>;
+    adminValidateIncident(token: string, id: string): Promise<void>;
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
     blockLicense(code: string): Promise<void>;
     blockUser(userId: Principal): Promise<void>;
+    checkCallerAdminStatus(): Promise<boolean>;
     checkLicenseValidity(code: string): Promise<string>;
     confirmIncident(id: string): Promise<void>;
     createIncident(userName: string, incidentType: string, description: string, lat: number, lng: number, neighborhood: string): Promise<string>;

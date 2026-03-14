@@ -18,6 +18,7 @@ import { LoginPage } from "./pages/LoginPage";
 import { MapPage } from "./pages/MapPage";
 import { ProfilePage } from "./pages/ProfilePage";
 import { RegisterPage } from "./pages/RegisterPage";
+import { RemoteAdminPage } from "./pages/RemoteAdminPage";
 import { SOSActivePage } from "./pages/SOSActivePage";
 import { ShareViewPage } from "./pages/ShareViewPage";
 
@@ -105,6 +106,12 @@ const shareRoute = createRoute({
   component: ShareViewPage,
 });
 
+const remoteAdminRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/remote-admin",
+  component: RemoteAdminPage,
+});
+
 const routeTree = rootRoute.addChildren([
   indexRoute,
   loginRoute,
@@ -118,6 +125,7 @@ const routeTree = rootRoute.addChildren([
   sosActiveRoute,
   adminRoute,
   shareRoute,
+  remoteAdminRoute,
 ]);
 
 const router = createRouter({ routeTree });
